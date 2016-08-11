@@ -1,0 +1,17 @@
+extends layout
+
+block code
+    script(src='index.js')
+
+
+block title
+    title Insight Server status
+
+block content
+    h1 Insight Server status
+    p
+        h3
+            #loader
+                span.label.label-primary Loading...
+        // Here come the results
+        pre#cmd-results-pre.
