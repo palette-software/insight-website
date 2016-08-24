@@ -1,17 +1,25 @@
 extends layout
+include mixins
 
 block code
     script(src='index.js')
-
 
 block title
     title Insight Server status
 
 block content
-    h1 Insight Server status
-    p
-        h3
-            #loader
-                span.label.label-primary Loading...
-        // Here come the results
-        pre#cmd-results-pre.
+    .panel.panel-info
+        .panel-heading
+            h3 Insight Server status
+        .panel-body
+            +status_row("Insight Server", status['gpfdist']['active'])
+            +status_row("GPFDist", status['gpfdist']['active'])
+            +status_row("LoadTables", status['datamodel']['load_tables'])
+            +status_row("Reporting", status['datamodel']['reporting'])
+    each category in status
+        .panel.panel-info
+            .panel-heading
+                h3= category
+            .panel-body
+                each val in status[category]
+                    +info(val, status[category][val])

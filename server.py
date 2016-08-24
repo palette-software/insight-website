@@ -21,7 +21,8 @@ def page(filename, content_type="text/html"):
     mylookup = TemplateLookup(directories=['templates/', '.'], preprocessor=mako_preprocessor)
 
     def render(req):
-        req.wfile.write(Template(filename='templates/' + filename, lookup=mylookup, preprocessor=mako_preprocessor).render())
+        status_dict = get_status()
+        req.wfile.write(Template(filename='templates/' + filename, lookup=mylookup, preprocessor=mako_preprocessor).render(status=status_dict))
 
     return render
 
@@ -40,25 +41,29 @@ def handler_fn(handler_fn, content_type="text/plain"):
 
     return render
 
-def get_dummy_subprocess_output(command_with_args):
+def get_dummy_subprocess_output():
     with open('sample.txt', 'r') as myfile:
         data = myfile.read()
         return data
 
 
-def status_handler(command_with_args):
+def get_status():
+    if not os.environ.has_key('DEBUG'):
+        try:
+            status = subprocess.check_output(["sudo", "/usr/local/bin/insight-services", "status"], stderr=subprocess.STDOUT)
+        except Exception:
+            status = "{}"
+    else:
+        status = get_dummy_subprocess_output()
+    status_json = parse_status(status)
+    return status_json
+
+
+def status_handler():
     """ Creates a handler that responds with the output of running the command
     throught POPEN """
     def handler(req):
-        if not os.environ.has_key('DEBUG'):
-            try:
-                status = subprocess.check_output(command_with_args, stderr=subprocess.STDOUT)
-            except Exception:
-                status = "{}"
-        else:
-            status = get_dummy_subprocess_output(command_with_args)
-        status_json = parse_status(status)
-        return status_json
+        get_status()
 
     return handler_fn(handler)
 
@@ -119,7 +124,8 @@ def parse_status(status):
         data['datamodel']['reporting'] = False
 
     # return status
-    return json.dumps(data, indent=4, sort_keys=True)
+    # return json.dumps(data, indent=4, sort_keys=True)
+    return data
 
 
 def command_handler(command_with_args):
@@ -168,7 +174,7 @@ class HTTPServer(SocketServer.TCPServer):
 HANDLER_MAP = {
         '/': page('index.jade'),
         '/control': page('control.jade'),
-        '/status' : status_handler(["sudo", "/usr/local/bin/insight-services", "status"]),
+        '/status' : status_handler(),
         }
 # ==================== Handlers ====================
 
