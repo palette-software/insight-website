@@ -18,7 +18,7 @@ script: echo "No Tests right now :("
 
 before_deploy:
   - export PCKG_DIR=`pwd`
-  - export PCKG_FILE=$PACKAGE-$PRODUCT_VERSION-$TRAVIS_PYTHON_VERSION.zip
+  - export PCKG_FILE=$PACKAGE-$PRODUCT_VERSION-python$TRAVIS_PYTHON_VERSION.zip
   - zip -r $PCKG_FILE $PCKG_DIR -x \*.git\* -x *\.travis.yml\*
 
 deploy:
