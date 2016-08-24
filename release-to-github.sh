@@ -6,18 +6,9 @@ if [ "X" == "X$GITHUB_TOKEN" ]; then echo "GITHUB_TOKEN environment variable is 
 if [ "X" == "X$HOME" ]; then echo "HOME environment variable is not set!"; exit 10; fi
 
 # These package are required for our "github-release-upload.py" script
-python --version
-pip --version
-
-sudo -H python --version
-sudo -H pip --version
-
+pip install --upgrade pip
 pip install requests
 pip install urllib3
-
-sudo -H pip install --upgrade pip
-sudo -H pip install requests
-sudo -H pip install urllib3
 
 echo "Creating Github realase..."
 export RELEASE_ID=`python github-release-upload.py`
