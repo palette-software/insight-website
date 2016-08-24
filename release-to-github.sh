@@ -8,6 +8,13 @@ if [ "X" == "X$HOME" ]; then echo "HOME environment variable is not set!"; exit 
 # These package are required for our "github-release-upload.py" script
 python --version
 pip --version
+
+sudo -H python --version
+sudo -H pip --version
+
+pip install requests
+pip install urllib3
+
 sudo -H pip install --upgrade pip
 sudo -H pip install requests
 sudo -H pip install urllib3
