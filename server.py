@@ -4,9 +4,9 @@ from mako.template import Template
 from mako.lookup import TemplateLookup
 from pyjade.ext.mako import preprocessor as mako_preprocessor
 
-from BaseHTTPServer import BaseHTTPRequestHandler,HTTPServer
-import SimpleHTTPServer
-import SocketServer
+from http.server import BaseHTTPRequestHandler,HTTPServer
+import http.server
+import socketserver
 import os
 import socket
 import subprocess
@@ -14,15 +14,16 @@ import json
 import re
 
 PORT = 9080
+BASEDIR = "/tmp"
 
 def page(filename, content_type="text/html"):
     """ Creates an HTTP handler function that responds with the contents of a
     file (path is relative to this script) """
-    mylookup = TemplateLookup(directories=['templates/', '.'], preprocessor=mako_preprocessor)
+    mylookup = TemplateLookup(directories=['/'], preprocessor=mako_preprocessor)
 
     def render(req):
         status_dict = get_status()
-        req.wfile.write(Template(filename='templates/' + filename, lookup=mylookup, preprocessor=mako_preprocessor).render(status=status_dict))
+        req.wfile.write(str.encode(Template(filename=BASEDIR + '/templates/' + filename, lookup=mylookup, preprocessor=mako_preprocessor).render(status=status_dict)))
 
     return render
 
@@ -37,7 +38,8 @@ def handler_fn(handler_fn, content_type="text/plain"):
         req.send_response(200)
         req.send_header('Content-type', content_type)
         req.end_headers()
-        req.wfile.write(response)
+        if response:
+            req.wfile.write(response)
 
     return render
 
@@ -48,9 +50,10 @@ def get_dummy_subprocess_output():
 
 
 def get_status():
-    if not os.environ.has_key('DEBUG'):
+    if 'DEBUG' not in os.environ:
         try:
             status = subprocess.check_output(["sudo", "/usr/local/bin/insight-services", "status"], stderr=subprocess.STDOUT)
+            status = status.decode()
         except Exception:
             status = "{}"
     else:
@@ -101,7 +104,7 @@ def parse_status(status):
     if match:
         data['greenplum']['primary-segment-failures'] = match.group(1)
 
-    match = re.search("insight-gpfdist\s+(\w+)\s+pid\s(\d+), uptime (.+?), \d+:\d+:\d+", status)
+    match = re.search("insight-gpfdist\s+(\w+)\s+pid\s(\d+), uptime.+?(\d+:\d+:\d+)", status)
     data['gpfdist'] = {}
     if match:
         data['gpfdist']['active'] = match.group(1) == 'RUNNING'
@@ -143,10 +146,10 @@ class RequestHandler(BaseHTTPRequestHandler):
         sendReply = False
 
         if self.path not in HANDLER_MAP:
-            filename = "static/" + self.path
+            filename = BASEDIR + "/static/" + self.path
             data = ""
             try:
-                with open(filename, 'r') as f:
+                with open(filename, 'rb') as f:
                     data=f.read()
                     self.send_response(200)
                     self.end_headers()
@@ -163,7 +166,7 @@ class RequestHandler(BaseHTTPRequestHandler):
 # Absolutely essential!  This ensures that socket resuse is setup BEFORE
 # it is bound.  Will avoid the TIME_WAIT issue
 
-class HTTPServer(SocketServer.TCPServer):
+class HTTPServer(socketserver.TCPServer):
     def server_bind(self):
         self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.socket.bind(self.server_address)
@@ -179,11 +182,12 @@ HANDLER_MAP = {
 # ==================== Handlers ====================
 
 try:
+    BASEDIR = os.path.dirname(os.path.abspath(__file__))
     httpd = HTTPServer(("", PORT), RequestHandler)
 
-    print "serving at port", PORT
+    print("serving at port", PORT)
     httpd.serve_forever()
 
 except KeyboardInterrupt:
-    print '^C received, shutting down the web server'
+    print('^C received, shutting down the web server')
     httpd.socket.close()
