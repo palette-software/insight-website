@@ -6,7 +6,7 @@ import urllib3
 def getRequiredEnvVar(name):
     envVar = os.environ.get(name)
     if envVar is None:
-        print 'Required environment variable: ' + name + ' is missing. Exiting...'
+        print('Required environment variable: ' + name + ' is missing. Exiting...')
         sys.exit(1)
     return envVar
 
@@ -26,19 +26,19 @@ def main():
     payload = {'tag_name': productVersion}
 
     r = requests.post(githubApiBaseUrl + '/repos/' + owner + '/' + package + '/releases', json=payload, headers=headers)
-    # print r.status_code, r.reason
-    # print r.text
+    # print(r.status_code, r.reason)
+    # print(r.text)
     responseJson = r.json()
     if r.status_code == 200 or r.status_code == 201:
         releaseId = responseJson['id']
         if releaseId is None:
             # This is unexpected. There is supposed to be a Github release ID in the response JSON.
-            print 'Error! Release ID was not found for the newly created Github release! Response:'
-            print r.text
+            print('Error! Release ID was not found for the newly created Github release! Response:')
+            print(r.text)
             sys.exit(1)
 
         # We are all good, let's print the ID of the newly created Github release
-        print releaseId
+        print(releaseId)
         sys.exit(0)
 
     releaseAlreadyExists = False
@@ -50,8 +50,8 @@ def main():
                 releaseAlreadyExists = True
                 break
         if not releaseAlreadyExists:
-            print 'Error! Release was expected to already exist, but it does not. Response:'
-            print r.text
+            print('Error! Release was expected to already exist, but it does not. Response:')
+            print(r.text)
             sys.exit(2)
 
         r = requests.get(githubApiBaseUrl + '/repos/' + owner + '/' + package + '/releases', headers=headers)
@@ -61,18 +61,18 @@ def main():
                 releaseId = ver['id']
                 if releaseId is None:
                     # This is unexpected. There is supposed to be a Github release ID in the response JSON.
-                    print 'Error! Release ID was not found in the existing Github release! Response:'
-                    print r.text
+                    print('Error! Release ID was not found in the existing Github release! Response:')
+                    print(r.text)
                     sys.exit(1)
 
                 # We are all good, let's print the ID of the existing Github release
-                print releaseId
+                print(releaseId)
                 sys.exit(0)
 
     # Github release ID was not found, and the response code was unexpected anyway
-    print 'Unexpected response status code: ', r.status_code
-    print 'Response message: '
-    print r.text
+    print('Unexpected response status code: ', r.status_code)
+    print('Response message: ')
+    print(r.text)
     sys.exit(3)
 
 if __name__ == "__main__":
