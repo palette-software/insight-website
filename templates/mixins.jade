@@ -1,0 +1,25 @@
+mixin status_button(status)
+    if status
+        .btn.btn-success
+            span OK 
+            span.glyphicon.glyphicon-ok
+    else
+        .btn.btn-danger
+            span Failed 
+            span.glyphicon.glyphicon-remove
+
+
+mixin status_row(label, status)
+    .row
+        .col-xs-6.col-md-4
+            h4= label
+        .col-xs-6.col-md-3
+            span
+                +status_button(status)
+
+mixin info(label, detail)
+    .row
+        .col-xs-6.col-md-4
+            h4= label
+        .col-xs-6.col-md-3
+            h4= detail

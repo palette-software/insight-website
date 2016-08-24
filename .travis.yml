@@ -1,0 +1,34 @@
+language: python
+python:
+  - "2.7"
+  - "3.5"
+
+env:
+  global:
+    - secure: "omw0SJff3lD9tIM1LSeWoDotXVyMbF2mNi6ZoIQa+dMSvHY+aQ7C9vLcCz9xaBHcwhwfIO4Fely7+vPw+rBpcYQyGPp1PxDLBsHuEHLN1QR5hzAZ84aVQTg8rWhTEikvdonBWJw8388g+ZPUIhlUy31QCNQXBEWCl3G2yljsfaxde2Ju0gZx+gcmtSyQZeNTGGap7GZwZ+MLfseZp45TlR9OgyqjMLNFXVdM8bQ7g6DHCVgQduxDCachF0wmZ38O8T5M3qZf+5I0Zq39tuVyT6R3FHsyrDcK4GqLNqabTU0u9QwN77P/JUGEtgw4sZIaSBfQ35E4vVT3RhA85eaSLhf8AOdwAv9svWk+xsYlDlLj800Lk4YCaBYOmnAurwLS4i1csyoaAlnLzE4BDfNVkb2GMUekroK+hxVgsVMI8Gjz3RkkPxWhuN977eT8LL4gFqjRKxwEBC8zVTZYgGm4utLJOwYtXFq9zjeZndOtH+MUPGCeWxdHytMAGiJA1Jm3UJPYS6vdJnGZy2z4lKB2UTZBzFRaXqZv2HZ4ejvYJFVG1eMdp+S+r+gh6HWb4zTNz5tyalMUFXYLgARX116SFV6KClIXXX0E02B4h7/5bQpxE9d2Ts68rhrDukCrr5pqPQwLciQKmcN+vT/ALuoWdWQVH5B6zyqCQk5LVcCD8so="
+    - PRODUCT_VERSION=v1.0.$TRAVIS_BUILD_NUMBER
+    - OWNER=palette-software
+    - PACKAGE=insight-services-status
+
+# command to install dependencies
+install: "pip install -r requirements.txt"
+
+# command to run tests
+script: echo "No Tests right now :("
+
+before_deploy:
+  - export PCKG_DIR=`pwd`
+  - export PCKG_FILE=$PACKAGE-$PRODUCT_VERSION-python$TRAVIS_PYTHON_VERSION.zip
+  - zip -r $PCKG_FILE $PCKG_DIR -x \*.git\* -x *\.travis.yml\*
+
+deploy:
+  skip_cleanup: true
+  provider: script
+  # Only deploy from the master branch (and if we don't have a tag specified, because they are auto-committed)
+  script: $TRAVIS_BUILD_DIR/release-to-github.sh
+  on:
+    branch: master
+    tags: false
+
+notifications:
+  email: false

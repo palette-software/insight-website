@@ -1,0 +1,15 @@
+extends layout
+
+block code
+    script(src='control.js')
+
+
+block title
+    title Insight Server Control
+
+block content
+    h1 Insight Server Control
+    p
+        .btn-toolbar
+            a.btn.btn-success.cmd-btn(href="/start") START
+            a.btn.btn-danger.cmd-btn(href="/stop") STOP
