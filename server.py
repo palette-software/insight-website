@@ -114,8 +114,12 @@ def parse_status(status):
         data['gpfdist']['active'] = False
 
     data['datamodel'] = {}
+    # We are matching on an optional # for commenting out the jobs
+    #   and after a cron timing definition (for example 5-55/5 * * * * ) i
+    #   and afterwards the name of the job
     match = re.search("(.*?([^\s]+\s){5}/opt/palette-insight-talend/load_tables.sh)", status)
     if match:
+        # Search for the # in the beginning
         data['datamodel']['load_tables'] = match and not re.search("\#", match.group(1))
     else:
         data['datamodel']['load_tables'] = False
@@ -126,8 +130,6 @@ def parse_status(status):
     else:
         data['datamodel']['reporting'] = False
 
-    # return status
-    # return json.dumps(data, indent=4, sort_keys=True)
     return data
 
 
