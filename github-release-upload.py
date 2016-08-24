@@ -23,7 +23,7 @@ def main():
 
     githubApiBaseUrl = 'https://api.github.com'
     headers = {'Authorization': 'token ' + githubToken}
-    payload = {'tag_name': productVersion}
+    payload = {'tag_name': productVersion, 'name': productVersion}
 
     r = requests.post(githubApiBaseUrl + '/repos/' + owner + '/' + package + '/releases', json=payload, headers=headers)
     # print(r.status_code, r.reason)
