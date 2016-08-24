@@ -28,7 +28,7 @@ deploy:
   # Only deploy from the master branch (and if we don't have a tag specified, because they are auto-committed)
   script: $TRAVIS_BUILD_DIR/release-to-github.sh
   on:
-    branch: master
+    branch: travis-test
     tags: false
 
 notifications:
