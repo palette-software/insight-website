@@ -115,7 +115,7 @@ def parse_status(status):
 
     data['datamodel'] = {}
     # We are matching on an optional # for commenting out the jobs
-    #   and after a cron timing definition (for example 5-55/5 * * * * ) i
+    #   and after a cron timing definition (for example 5-55/5 * * * * )
     #   and afterwards the name of the job
     match = re.search("(.*?([^\s]+\s){5}/opt/palette-insight-talend/load_tables.sh)", status)
     if match:
