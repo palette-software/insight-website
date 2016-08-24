@@ -1,0 +1,57 @@
+=====[ Temporary backup crontab /etc/insight-services/insight.cron.tmp exists ]=====
+
+
+=====[ Greenplum status ]=====
+20160811:19:23:24:017005 gpstate:dev-insight:gpadmin-[INFO]:-Starting gpstate with args:
+20160811:19:23:24:017005 gpstate:dev-insight:gpadmin-[INFO]:-local Greenplum Version: 'postgres (Greenplum Database) 4.3.7.3 build 2'
+20160811:19:23:24:017005 gpstate:dev-insight:gpadmin-[INFO]:-master Greenplum Version: 'PostgreSQL 8.2.15 (Greenplum Database 4.3.7.3 build 2) on x86_64-unknown-linux-gnu, compiled by GCC gcc (GCC) 4.4.2 compiled on Feb 25 2016 06:38:30'
+20160811:19:23:24:017005 gpstate:dev-insight:gpadmin-[INFO]:-Obtaining Segment details from master...
+20160811:19:23:24:017005 gpstate:dev-insight:gpadmin-[INFO]:-Gathering data from segments...
+..
+20160811:19:23:26:017005 gpstate:dev-insight:gpadmin-[INFO]:-Greenplum instance status summary
+20160811:19:23:26:017005 gpstate:dev-insight:gpadmin-[INFO]:-----------------------------------------------------
+20160811:19:23:26:017005 gpstate:dev-insight:gpadmin-[INFO]:-   Master instance                                = Active
+20160811:19:23:26:017005 gpstate:dev-insight:gpadmin-[INFO]:-   Master standby                                 = No master standby configured
+20160811:19:23:26:017005 gpstate:dev-insight:gpadmin-[INFO]:-   Total segment instance count from metadata     = 4
+20160811:19:23:26:017005 gpstate:dev-insight:gpadmin-[INFO]:-----------------------------------------------------
+20160811:19:23:26:017005 gpstate:dev-insight:gpadmin-[INFO]:-   Primary Segment Status
+20160811:19:23:26:017005 gpstate:dev-insight:gpadmin-[INFO]:-----------------------------------------------------
+20160811:19:23:26:017005 gpstate:dev-insight:gpadmin-[INFO]:-   Total primary segments                         = 4
+20160811:19:23:26:017005 gpstate:dev-insight:gpadmin-[INFO]:-   Total primary segment valid (at master)        = 4
+20160811:19:23:26:017005 gpstate:dev-insight:gpadmin-[INFO]:-   Total primary segment failures (at master)     = 0
+20160811:19:23:26:017005 gpstate:dev-insight:gpadmin-[INFO]:-   Total number of postmaster.pid files missing   = 0
+20160811:19:23:26:017005 gpstate:dev-insight:gpadmin-[INFO]:-   Total number of postmaster.pid files found     = 4
+20160811:19:23:26:017005 gpstate:dev-insight:gpadmin-[INFO]:-   Total number of postmaster.pid PIDs missing    = 0
+20160811:19:23:26:017005 gpstate:dev-insight:gpadmin-[INFO]:-   Total number of postmaster.pid PIDs found      = 4
+20160811:19:23:26:017005 gpstate:dev-insight:gpadmin-[INFO]:-   Total number of /tmp lock files missing        = 0
+20160811:19:23:26:017005 gpstate:dev-insight:gpadmin-[INFO]:-   Total number of /tmp lock files found          = 4
+20160811:19:23:26:017005 gpstate:dev-insight:gpadmin-[INFO]:-   Total number postmaster processes missing      = 0
+20160811:19:23:26:017005 gpstate:dev-insight:gpadmin-[INFO]:-   Total number postmaster processes found        = 4
+20160811:19:23:26:017005 gpstate:dev-insight:gpadmin-[INFO]:-----------------------------------------------------
+20160811:19:23:26:017005 gpstate:dev-insight:gpadmin-[INFO]:-   Mirror Segment Status
+20160811:19:23:26:017005 gpstate:dev-insight:gpadmin-[INFO]:-----------------------------------------------------
+20160811:19:23:26:017005 gpstate:dev-insight:gpadmin-[INFO]:-   Mirrors not configured on this array
+20160811:19:23:26:017005 gpstate:dev-insight:gpadmin-[INFO]:-----------------------------------------------------
+
+
+=====[ Insight-GPFDist status ]=====
+insight-gpfdist                  RUNNING   pid 18553, uptime 1 day, 6:36:18
+
+
+=====[ Current crontab used for insight ]=====
+#Ansible: Palette Insight Load Tables
+* * * * * /opt/palette-insight-talend/load_tables.sh
+#Ansible: Palette Insight Reporting
+*/5 * * * * /home/insight/loadctrl.sh
+#Ansible: Palette Insight Sanity Checks
+*/10 * * * * /opt/insight-sanity-check/dbcheck /opt/insight-sanity-check/tests/sanity_checks.yml /opt/insight-sanity-check/Config.yml > /dev/null
+
+
+=====[ Currently running talend jobs ]=====
+ +  PI_Reporting_prod
+  +  PI_ImportTables_prod
+
+
+  =====[ OK ]=====
+
+
