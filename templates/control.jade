@@ -11,5 +11,9 @@ block content
     h1 Insight Server Control
     p
         .btn-toolbar
-            a.btn.btn-success.cmd-btn(href="/start") START
-            a.btn.btn-danger.cmd-btn(href="/stop") STOP
+            a.btn.btn-success.cmd-btn(href="/control/start") START
+            a.btn.btn-danger.cmd-btn(href="/control/stop") STOP
+            a.btn.btn-info.cmd-btn(href="/control/test") UPDATE
+    p
+        .progress.hidden#progress
+            .progress-bar.progress-bar-striped.actived#progressBar(role="progressbar", aria-valuenow="0", ariva-valuemin="0", aria-valuemax="100") 
