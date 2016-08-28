@@ -70,10 +70,23 @@ def status_handler():
 
     return handler_fn(handler)
 
+def service_status(service_name, raw_status_message):
+    match = re.search(service_name + "\s+(\w+)\s+pid\s(\d+), uptime.+?(\d+:\d+:\d+)", raw_status_message)
+    status = {}
+    if match:
+        status['active'] = match.group(1) == 'RUNNING'
+        status['pid'] = match.group(2)
+        status['uptime'] = match.group(3)
+    else:
+        status['active'] = False
+    status["show_detail"] = True
+    return status
 
 def parse_status(status):
     data = {}
     data["greenplum"] = {}
+    data['greenplum']['show_detail'] = True
+    data['greenplum']['display_name'] = "Palette Insight Repository"
     match = re.search("local Greenplum Version: 'postgres \(Greenplum Database\) (.+?)'", status)
     if match:
         data['greenplum']['local-greenplum-version'] = match.group(1)
@@ -104,31 +117,46 @@ def parse_status(status):
     if match:
         data['greenplum']['primary-segment-failures'] = match.group(1)
 
-    match = re.search("insight-gpfdist\s+(\w+)\s+pid\s(\d+), uptime.+?(\d+:\d+:\d+)", status)
-    data['gpfdist'] = {}
+    data['gpfdist'] = service_status("insight-gpfdist", status)
+    data['gpfdist']['display_name'] = "Palette Insight Load"
+    data['status-page'] = service_status("insight-services-webui", status)
+    data['status-page']['display_name'] = "Palette Insight Website"
+    data['palette-insight-server'] = {}
+    data['palette-insight-server'] = service_status("palette-insight-server", status)
+    data['palette-insight-server']['display_name'] = "Palette Insight Web Service"
+
+    match = re.search("palette-insight-server-(\d+\.\d+\.\d+).*", status)
     if match:
-        data['gpfdist']['active'] = match.group(1) == 'RUNNING'
-        data['gpfdist']['pid'] = match.group(2)
-        data['gpfdist']['uptime'] = match.group(3)
-    else:
-        data['gpfdist']['active'] = False
+        data['palette-insight-server']['version'] = match.group(1)
+
 
     data['datamodel'] = {}
+    data['datamodel']['show_detail'] = False
+    data['datamodel']['load_tables'] = {}
+    data['datamodel']['reporting'] = {}
     # We are matching on an optional # for commenting out the jobs
     #   and after a cron timing definition (for example 5-55/5 * * * * ) i
     #   and afterwards the name of the job
     match = re.search("(.*?([^\s]+\s){5}/opt/palette-insight-talend/load_tables.sh)", status)
     if match:
         # Search for the # in the beginning
-        data['datamodel']['load_tables'] = match and not re.search("\#", match.group(1))
+        data['datamodel']['load_tables']['active'] = match and not re.search("\#", match.group(1))
     else:
-        data['datamodel']['load_tables'] = False
+        data['datamodel']['load_tables']['active'] = False
+
+    match = re.search("palette-insight-loadtables-(\d+\.\d+\.\d+).*", status)
+    if match:
+        data['datamodel']['load_tables']['version'] = match.group(1)
 
     match = re.search("(.*?([^\s]+\s){5}/home/insight/loadctrl.sh)", status)
     if match:
-        data['datamodel']['reporting'] = match and not re.search("\#", match.group(1))
+        data['datamodel']['reporting']['active'] = match and not re.search("\#", match.group(1))
     else:
-        data['datamodel']['reporting'] = False
+        data['datamodel']['reporting']['active'] = False
+
+    match = re.search("palette-insight-reporting-(\d+\.\d+\.\d+).*", status)
+    if match:
+        data['datamodel']['reporting']['version'] = match.group(1)
 
     return data
 

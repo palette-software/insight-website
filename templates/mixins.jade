@@ -1,21 +1,27 @@
 mixin status_button(status)
     if status
         .btn.btn-success
-            span OK 
+            span Running
             span.glyphicon.glyphicon-ok
     else
         .btn.btn-danger
-            span Failed 
+            span Stopped 
             span.glyphicon.glyphicon-remove
 
 
 mixin status_row(label, status)
     .row
         .col-xs-6.col-md-4
-            h4= label
+            if 'version' in status
+                h4 #{label} (v#{status['version']})
+            else
+                h4= label
         .col-xs-6.col-md-3
             span
-                +status_button(status)
+                if 'active' in status
+                    +status_button(status['active'])
+                else
+                    +status_button(False)
 
 mixin info(label, detail)
     .row
