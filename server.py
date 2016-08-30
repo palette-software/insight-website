@@ -165,8 +165,8 @@ def command_handler(command_with_args):
     """ Creates a handler that responds with the output of running the command
     throught POPEN """
     def handler(req):
-        output = subprocess.check_output(command_with_args, stderr=subprocess.STDOUT)
-        return output
+        output = subprocess.run(command_with_args)
+        return output.returncode
 
     return handler_fn(handler)
 
@@ -208,6 +208,7 @@ HANDLER_MAP = {
         '/': page('index.jade'),
         '/control': page('control.jade'),
         '/status' : status_handler(),
+	'/control/update': command_handler(["/opt/insight-toolkit/update.sh"])
         }
 # ==================== Handlers ====================
 
