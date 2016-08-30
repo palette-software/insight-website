@@ -23,6 +23,8 @@ def page(filename, content_type="text/html"):
 
     def render(req):
         status_dict = get_status()
+        req.send_response(200)
+        req.end_headers()
         req.wfile.write(str.encode(Template(filename=BASEDIR + '/templates/' + filename, lookup=mylookup, preprocessor=mako_preprocessor).render(status=status_dict)))
 
     return render
@@ -34,12 +36,14 @@ def handler_fn(handler_fn, content_type="text/plain"):
 
     def render(req):
         response = handler_fn(req)
-
-        req.send_response(200)
-        req.send_header('Content-type', content_type)
-        req.end_headers()
-        if response:
-            req.wfile.write(response)
+        if response != 0:
+            req.send_response(500)
+            req.send_header('Content-type', content_type)
+            req.end_headers()
+        else:
+            req.send_response(200)
+            req.send_header('Content-type', content_type)
+            req.end_headers()
 
     return render
 
@@ -165,8 +169,8 @@ def command_handler(command_with_args):
     """ Creates a handler that responds with the output of running the command
     throught POPEN """
     def handler(req):
-        output = subprocess.check_output(command_with_args, stderr=subprocess.STDOUT)
-        return output
+        output = subprocess.run(command_with_args)
+        return output.returncode
 
     return handler_fn(handler)
 
@@ -186,6 +190,7 @@ class RequestHandler(BaseHTTPRequestHandler):
                     self.wfile.write(data)
             except IOError:
                 self.send_response(404)
+                self.end_headers()
             return
 
 
@@ -208,6 +213,7 @@ HANDLER_MAP = {
         '/': page('index.jade'),
         '/control': page('control.jade'),
         '/status' : status_handler(),
+	'/control/update': command_handler(["/opt/insight-toolkit/update.sh"])
         }
 # ==================== Handlers ====================
 
