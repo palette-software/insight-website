@@ -1,4 +1,4 @@
-$(function(){
+$( document ).ready(function() {
     var setProgress = function(progressBar, value) {
         progressBar.attr("aria-valuenow", value);
         progressBar.attr("style", "width: " + value + "%;");
