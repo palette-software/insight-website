@@ -4,10 +4,24 @@ python:
 
 env:
   global:
+    # GITHUB_TOKEN=...
     - secure: "NVj+dKlTlOySMVqMdotAkoQkys1tnLo6GBNwZ6NRcaKRtIq1tF0edRUey3EWHVsNueHDzZzkiXZeeGdskQ0IoUm1qMEZ1pf6GR8iLkraZnUdqqYvSO1HFY96GzpkZ2pGDzj8cU2MQIQf2G8rh+SJyoVCD/VeKc62NlAKxXiLXgbFby+80lmaLkluGlsxOurKXhcBYRZbH5Z51vC4Dz51SQozFy2+Ld4QpEAqoFaY0810XZUcNtjEKECsiFApyqU+SeHbw8lzid0ryOPmZBi/voyq6N0L3ILy9m8CoormIP+5M0SLuspWy8OmFMS1YXotk/7usu/fRwOQwevT5p+SkQajaMNQwXvwy33i3nR6fHBN+r6lmiHtI4soPWAxJ74ozfsEO5sx4frn3xE3ulQn/mRzl9obAKjzr/WrudmlN6v5qCh4x1gscMAPDJ3dSafuVVuehsh3KEQNROgoOr85S9qTx7jhhPwR6ofl7zG7R+JfTBn6mqX4g4h7iz5aC/QwenHPyKp8ramuf7mYaJrMHOv1HalsgYkCKwDpI4k0Y27UnhcDR/lW99BXCMP2A5k1ksBN0mrzmO+Mk0bUHUKUjoR1Ax0BYRVAdyGkepNjHpCyRMsWzwzyO1hBHARbg0iE+RFieCSAKbXtKn+qUcwf1mE8ETWdXkGuoqUegzwuL3E="
+    # DEPLOY_PASS=....
+    - secure: "yft2StparIdA6uL9bjUmV3s47i9Mu5B9ld65xMzmf6wzeh8XDAG68OB7XxjSayCmpvqU6XuSUYRPG89FL7LAagZWz/zlyK9MYooN0vATRA3rcQB+CdPSSyO/R45/tEpk+B000pRhuAxN/PptDYNn/8cGUoLILLWqaNZHP9N2yniFZoobaL76N7N2ngQAl9ltVThtJIqap5TN4RTmdyajMDcbZmRBzGDFAMZ+JGHdom0qWHK5J9zEuO1qg9klXRbezSf/cd0vK/PGDLAmnJMe42h72daqF0KPrFNZFNiDfqCBw9WWT5Pe83vPBAImw0LthuD4dokSbDrhoi3E19xW0OsXhkav/B9cA1fjRs5VRIGPepSIrUGKXcnar2PNvd9IKoy9vpgZqxdNGFoXT1BNLfab3qh3EGjd6T8Rzjzgz6o1ZRlbhVYiYJm96N6c6+gIxG+e+onu3g+gj9cXckrzU/7/XDgVhg6dYuWnYggiy//3Ai0sS3kmEiyNu10r2KTswBmgaeNCh992siLBussrXm5dXyMyR3vbzDQQfJ3G6yk+TtyWMFhe+wOejLfzxx6a6jtPAne/uorvcVHRsCtRxTzp9mE8Jc7C4aJpMQV9JszsdtzAxVdx2uApx/hD4XuLvGLcIpy9Mfu+JR8ykB3uuKHFFA+NHVplwlr4B9IDCiA="
     - PRODUCT_VERSION=v1.0.$TRAVIS_BUILD_NUMBER
     - OWNER=palette-software
     - PACKAGE=insight-services-status
+    - DEPLOY_HOST=rpm.palette-software.com
+    - DEPLOY_PATH=/var/palette-rpm-repo
+    - DEPLOY_USER=palette-rpm
+
+# install the RPM package
+addons:
+  apt:
+    packages:
+      - rpm
+      # To deploy the rpms, we need to ssh into places, and we dont want to store keys for now
+      - sshpass
 
 # command to install dependencies
 install: "pip install -r requirements.txt"
@@ -16,18 +30,32 @@ install: "pip install -r requirements.txt"
 script: echo "No Tests right now :("
 
 before_deploy:
+  # Create the zip file for github upload
   - export PCKG_DIR=`pwd`
   - export PCKG_FILE=$PACKAGE-$PRODUCT_VERSION-python$TRAVIS_PYTHON_VERSION.zip
   - zip -r $PCKG_FILE $PCKG_DIR -x \*.git\* -x *\.travis.yml\*
 
+  # Prepare rpm content
+  - mkdir -p rpm-build/opt/insight-services-webui
+  - mkdir -p rpm-build/var/log/insight-services-webui
+  - cp server.py rpm-build/opt/insight-services-webui
+  - cp -R static rpm-build/opt/insight-services-webui
+  - cp -R templates rpm-build/opt/insight-services-webui
+  - pushd rpm-build
+
+  # Build rpm package
+  - mkdir -p _build
+  - rpmbuild -bb --buildroot $(pwd) --define "version $PRODUCT_VERSION" --define "buildrelease $TRAVIS_BUILD_NUMBER" --define "_rpmdir $(pwd)/_build" ../insight-services-webui.spec
+  - popd
+
 deploy:
-  skip_cleanup: true
   provider: script
-  # Only deploy from the master branch (and if we don't have a tag specified, because they are auto-committed)
-  script: $TRAVIS_BUILD_DIR/release-to-github.sh
+  script: "./deploy.sh"
+  skip_cleanup: true
   on:
     branch: master
     tags: false
 
 notifications:
   email: false
+
