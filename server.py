@@ -7,6 +7,7 @@ from pyjade.ext.mako import preprocessor as mako_preprocessor
 from http.server import BaseHTTPRequestHandler,HTTPServer
 import http.server
 import socketserver
+from socketserver import ThreadingMixIn
 import os
 import socket
 import subprocess
@@ -15,6 +16,19 @@ import re
 
 PORT = 9080
 BASEDIR = "/tmp"
+
+# The following class helps those who need to develop on Windows
+# as on there TCP socket is not closed for a long time (about a minute)
+# after server is stopped.
+# class HTTPServer(socketserver.TCPServer):
+#    def server_bind(self):
+#        self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+#        self.socket.bind(self.server_address)
+# class ThreadingServer(ThreadingMixIn, HTTPServer):
+#     pass
+
+class ThreadingServer(ThreadingMixIn, socketserver.TCPServer):
+    pass
 
 def page(filename, content_type="text/html"):
     """ Creates an HTTP handler function that responds with the contents of a
@@ -177,35 +191,29 @@ def command_handler(command_with_args):
 
 class RequestHandler(BaseHTTPRequestHandler):
     def do_GET(self):
-        sendReply = False
+        try:
+            sendReply = False
 
-        if self.path not in HANDLER_MAP:
-            filename = BASEDIR + "/static/" + self.path
-            data = ""
-            try:
-                with open(filename, 'rb') as f:
-                    data=f.read()
-                    self.send_response(200)
+            if self.path not in HANDLER_MAP:
+                filename = BASEDIR + "/static/" + self.path
+                data = ""
+                try:
+                    with open(filename, 'rb') as f:
+                        data=f.read()
+                        self.send_response(200)
+                        self.end_headers()
+                        self.wfile.write(data)
+                except IOError:
+                    self.send_response(404)
                     self.end_headers()
-                    self.wfile.write(data)
-            except IOError:
-                self.send_response(404)
-                self.end_headers()
-            return
+                return
 
-
-        # call the actual handler
-        output_data = HANDLER_MAP[self.path](self)
+            # call the actual handler
+            output_data = HANDLER_MAP[self.path](self)
+        except socket.error:
+            pass
+        self.rfile.close()
         return
-
-# Absolutely essential!  This ensures that socket resuse is setup BEFORE
-# it is bound.  Will avoid the TIME_WAIT issue
-
-class HTTPServer(socketserver.TCPServer):
-    def server_bind(self):
-        self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        self.socket.bind(self.server_address)
-
 
 # ==================== Handlers ====================
 
@@ -219,7 +227,7 @@ HANDLER_MAP = {
 
 try:
     BASEDIR = os.path.dirname(os.path.abspath(__file__))
-    httpd = HTTPServer(("", PORT), RequestHandler)
+    httpd = ThreadingServer(("", PORT), RequestHandler)
 
     print("serving at port", PORT)
     httpd.serve_forever()
