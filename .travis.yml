@@ -39,6 +39,7 @@ before_deploy:
   - mkdir -p rpm-build/opt/insight-services-webui
   - mkdir -p rpm-build/var/log/insight-services-webui
   - cp server.py rpm-build/opt/insight-services-webui
+  - cp requirements.txt rpm-build/opt/insight-services-webui
   - cp -R static rpm-build/opt/insight-services-webui
   - cp -R templates rpm-build/opt/insight-services-webui
   - pushd rpm-build
