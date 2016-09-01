@@ -27,10 +27,6 @@ class HTTPServer(socketserver.TCPServer):
         self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.socket.bind(self.server_address)
 
-class ThreadingServer(ThreadingMixIn, socketserver.TCPServer):
-    pass
-
-
 class ThreadingServer(ThreadingMixIn, HTTPServer):
     pass
 
@@ -147,9 +143,15 @@ class RequestHandler(BaseHTTPRequestHandler):
         try:
             if self.path == '/':
                 status_dict = get_status()
-                respond_html(self, Template(filename=BASEDIR + '/templates/index.jade', lookup=TEMPLATE_LOOKUP, preprocessor=mako_preprocessor, module_directory="/tmp/mako_modules").render(status=status_dict))
+                respond_html(self,
+                    Template(filename=BASEDIR + '/templates/index.jade',
+                        lookup=TEMPLATE_LOOKUP, preprocessor=mako_preprocessor,
+                        module_directory="/tmp/mako_modules").render(status=status_dict))
             elif self.path == '/control':
-                respond_html(self, Template(filename=BASEDIR + '/templates/control.jade', lookup=TEMPLATE_LOOKUP, preprocessor=mako_preprocessor, module_directory="/tmp/mako_modules").render())
+                respond_html(self,
+                    Template(filename=BASEDIR + '/templates/control.jade',
+                        lookup=TEMPLATE_LOOKUP, preprocessor=mako_preprocessor,
+                        module_directory="/tmp/mako_modules").render())
             elif self.path == '/control/update':
                 output = subprocess.run(["/opt/insight-toolkit/update.sh"])
                 if output != 0:
@@ -157,13 +159,10 @@ class RequestHandler(BaseHTTPRequestHandler):
                 else:
                     respond_html(self, "")
             elif self.path == '/control/update/progress':
-                with subprocess.Popen(["tail","-1","/tmp/progress.log"], stdout=subprocess.PIPE) as proc:
+                with subprocess.Popen(["tail","-1","/var/log/insight-services/progress.log"],
+                        stdout=subprocess.PIPE,
+                        stderr=subprocess.DEVNULL) as proc:
                     respond_json(self, {'line': proc.stdout.read().decode()})
-                # ret = subprocess.run(["tail","-1","/tmp/progress.log"], stdout=subprocess.PIPE)
-                # respond_json(self, {'line': ret.stdout.decode()})
-                # output = subprocess.check_output(["tail","-1","/tmp/progress.log"])
-                # output = b"hello\n"
-                # respond_json(self, {'line': output.decode()})
             else:
                 filename = BASEDIR + "/static/" + self.path
                 data = ""
