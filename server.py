@@ -6,66 +6,38 @@ from pyjade.ext.mako import preprocessor as mako_preprocessor
 
 from http.server import BaseHTTPRequestHandler,HTTPServer
 import http.server
+
+import socket
 import socketserver
 from socketserver import ThreadingMixIn
+
 import os
-import socket
 import subprocess
 import json
 import re
 
 PORT = 9080
 BASEDIR = "/tmp"
+TEMPLATE_LOOKUP = TemplateLookup(directories=['/'], preprocessor=mako_preprocessor)
 
-# The following class helps those who need to develop on Windows
-# as on there TCP socket is not closed for a long time (about a minute)
-# after server is stopped.
-# class HTTPServer(socketserver.TCPServer):
-#    def server_bind(self):
-#        self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-#        self.socket.bind(self.server_address)
-# class ThreadingServer(ThreadingMixIn, HTTPServer):
-#     pass
+# The following class helps development as TCP socket
+# is not closed for a long time (about a minute) after server is stopped.
+class HTTPServer(socketserver.TCPServer):
+    def server_bind(self):
+        self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self.socket.bind(self.server_address)
 
 class ThreadingServer(ThreadingMixIn, socketserver.TCPServer):
     pass
 
-def page(filename, content_type="text/html"):
-    """ Creates an HTTP handler function that responds with the contents of a
-    file (path is relative to this script) """
-    mylookup = TemplateLookup(directories=['/'], preprocessor=mako_preprocessor)
 
-    def render(req):
-        status_dict = get_status()
-        req.send_response(200)
-        req.end_headers()
-        req.wfile.write(str.encode(Template(filename=BASEDIR + '/templates/' + filename, lookup=mylookup, preprocessor=mako_preprocessor).render(status=status_dict)))
-
-    return render
-
-
-def handler_fn(handler_fn, content_type="text/plain"):
-    """ Creates an HTTP handler that responds with the return value of a
-    function """
-
-    def render(req):
-        response = handler_fn(req)
-        if response != 0:
-            req.send_response(500)
-            req.send_header('Content-type', content_type)
-            req.end_headers()
-        else:
-            req.send_response(200)
-            req.send_header('Content-type', content_type)
-            req.end_headers()
-
-    return render
+class ThreadingServer(ThreadingMixIn, HTTPServer):
+    pass
 
 def get_dummy_subprocess_output():
     with open('sample.txt', 'r') as myfile:
         data = myfile.read()
         return data
-
 
 def get_status():
     if 'DEBUG' not in os.environ:
@@ -78,15 +50,6 @@ def get_status():
         status = get_dummy_subprocess_output()
     status_json = parse_status(status)
     return status_json
-
-
-def status_handler():
-    """ Creates a handler that responds with the output of running the command
-    throught POPEN """
-    def handler(req):
-        get_status()
-
-    return handler_fn(handler)
 
 def service_status(service_name, raw_status_message):
     match = re.search(service_name + "\s+(\w+)\s+pid\s(\d+), uptime.+?(\d+:\d+:\d+)", raw_status_message)
@@ -179,22 +142,29 @@ def parse_status(status):
     return data
 
 
-def command_handler(command_with_args):
-    """ Creates a handler that responds with the output of running the command
-    throught POPEN """
-    def handler(req):
-        output = subprocess.run(command_with_args)
-        return output.returncode
-
-    return handler_fn(handler)
-
-
 class RequestHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         try:
-            sendReply = False
-
-            if self.path not in HANDLER_MAP:
+            if self.path == '/':
+                status_dict = get_status()
+                respond_html(self, Template(filename=BASEDIR + '/templates/index.jade', lookup=TEMPLATE_LOOKUP, preprocessor=mako_preprocessor, module_directory="/tmp/mako_modules").render(status=status_dict))
+            elif self.path == '/control':
+                respond_html(self, Template(filename=BASEDIR + '/templates/control.jade', lookup=TEMPLATE_LOOKUP, preprocessor=mako_preprocessor, module_directory="/tmp/mako_modules").render())
+            elif self.path == '/control/update':
+                output = subprocess.run(["/opt/insight-toolkit/update.sh"])
+                if output != 0:
+                    respond_error(self)
+                else:
+                    respond_html(self, "")
+            elif self.path == '/control/update/progress':
+                with subprocess.Popen(["tail","-1","/tmp/progress.log"], stdout=subprocess.PIPE) as proc:
+                    respond_json(self, {'line': proc.stdout.read().decode()})
+                # ret = subprocess.run(["tail","-1","/tmp/progress.log"], stdout=subprocess.PIPE)
+                # respond_json(self, {'line': ret.stdout.decode()})
+                # output = subprocess.check_output(["tail","-1","/tmp/progress.log"])
+                # output = b"hello\n"
+                # respond_json(self, {'line': output.decode()})
+            else:
                 filename = BASEDIR + "/static/" + self.path
                 data = ""
                 try:
@@ -206,24 +176,26 @@ class RequestHandler(BaseHTTPRequestHandler):
                 except IOError:
                     self.send_response(404)
                     self.end_headers()
-                return
-
-            # call the actual handler
-            output_data = HANDLER_MAP[self.path](self)
         except socket.error:
             pass
         self.rfile.close()
-        return
 
-# ==================== Handlers ====================
+def respond_error(req):
+    req.send_response(500)
+    req.end_headers()
 
-HANDLER_MAP = {
-        '/': page('index.jade'),
-        '/control': page('control.jade'),
-        '/status' : status_handler(),
-	'/control/update': command_handler(["/opt/insight-toolkit/update.sh"])
-        }
-# ==================== Handlers ====================
+def respond_html(req, content):
+    req.send_response(200)
+    req.send_header('Content-type', 'text/html')
+    req.end_headers()
+    req.wfile.write(str.encode(content))
+
+def respond_json(req, data):
+    json_data = json.dumps(data)
+    req.send_response(200)
+    req.send_header('Content-type', 'application/json')
+    req.end_headers()
+    req.wfile.write(str.encode(json_data))
 
 try:
     BASEDIR = os.path.dirname(os.path.abspath(__file__))
