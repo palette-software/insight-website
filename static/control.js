@@ -4,6 +4,20 @@ $( document ).ready(function() {
         progressBar.attr("style", "width: " + value + "%;");
     };
 
+    var getProgress = window.setInterval(function() {
+        $.ajax({
+            url: "/control/update/progress"
+        })
+        .done(function( data ) {
+            statusContent = $('#status');
+            if (data != undefined && data.line != "") {
+                statusContent.html(data.line);
+            } else {
+                statusContent.html("");
+            }
+        });
+    }, 1000);
+
     $('.cmd-btn').click(function(e){
         e.preventDefault();
         var $this = $(this);
@@ -20,12 +34,15 @@ $( document ).ready(function() {
                 setProgress(progressBar, progress);
             }
         }, 400);
+
         $.ajax({
             url: targetUrl,
         })
         .done(function( data ) {
             setProgress(progressBar, 100);
             window.clearInterval(ticker);
+            statusContent.html("");
+
             delayedHide = window.setTimeout(function() {
                 progressCtl.addClass("hidden");
                 delayedHide = window.clearTimeout();
