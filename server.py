@@ -152,14 +152,14 @@ class RequestHandler(BaseHTTPRequestHandler):
                     Template(filename=BASEDIR + '/templates/control.jade',
                         lookup=TEMPLATE_LOOKUP, preprocessor=mako_preprocessor,
                         module_directory="/tmp/mako_modules").render())
+            elif self.path == '/control/start':
+                respond_command_output(self, ["sudo", "/usr/local/bin/insight-services", "start"])
+            elif self.path == '/control/stop':
+                respond_command_output(self, ["sudo", "/usr/local/bin/insight-services", "stop"])
             elif self.path == '/control/update':
-                output = subprocess.run(["/opt/insight-toolkit/update.sh"])
-                if output != 0:
-                    respond_error(self)
-                else:
-                    respond_html(self, "")
+                respond_command_output(self, ["/opt/insight-toolkit/update.sh"])
             elif self.path == '/control/update/progress':
-                with subprocess.Popen(["tail","-1","/var/log/insight-services/progress.log"],
+                with subprocess.Popen(["tail","-10","/var/log/insight-services/progress.log"],
                         stdout=subprocess.PIPE,
                         stderr=subprocess.DEVNULL) as proc:
                     respond_json(self, {'line': proc.stdout.read().decode()})
@@ -178,6 +178,13 @@ class RequestHandler(BaseHTTPRequestHandler):
         except socket.error:
             pass
         self.rfile.close()
+
+def respond_command_output(req, command_with_args):
+    output = subprocess.run(command_with_args)
+    if output != 0:
+        respond_error(req)
+    else:
+        respond_html(req, "")
 
 def respond_error(req):
     req.send_response(500)

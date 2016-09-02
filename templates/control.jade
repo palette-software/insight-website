@@ -8,13 +8,22 @@ block title
     title Insight Server Control
 
 block content
-    h1 Insight Server Control
-    p
-        .btn-toolbar
-            a.btn.btn-success.cmd-btn(href="/control/start") START
-            a.btn.btn-danger.cmd-btn(href="/control/stop") STOP
-            a.btn.btn-info.cmd-btn(href="/control/update") UPDATE
-    p
-        .progress.hidden#progress
-            .progress-bar.progress-bar-striped.actived#progressBar(role="progressbar", aria-valuenow="0", ariva-valuemin="0", aria-valuemax="100") 
-    pre#status
+    .row
+        .col-md-4
+            .panel.panel-info
+                .panel-heading
+                    h3 Control
+                .panel-body
+                    p
+                        .btn-toolbar
+                            a.btn.btn-success.cmd-btn(href="/control/start") START
+                            a.btn.btn-danger.cmd-btn(href="/control/stop") STOP
+                            a.btn.btn-info.cmd-btn#update(href="/control/update") UPDATE
+                    p
+                        .progress.hidden#progress
+                            .progress-bar.progress-bar-striped.actived#progressBar(role="progressbar", aria-valuenow="0", ariva-valuemin="0", aria-valuemax="100") 
+            .panel.panel-info.hidden#statusPanel
+                .panel-heading
+                    h3 Update progress
+                .panel-body
+                    pre#status
