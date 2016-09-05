@@ -98,6 +98,10 @@ def parse_status(status):
     data['gpfdist']['display_name'] = "Palette Insight Load"
     data['status-page'] = service_status("insight-services-webui", status)
     data['status-page']['display_name'] = "Palette Insight Website"
+    match = re.search("palette-insight-website-v(\d+\.\d+\.\d+).*", status)
+    if match:
+        data['status-page']['version'] = match.group(1)
+
     data['palette-insight-server'] = {}
     data['palette-insight-server'] = service_status("palette-insight-server", status)
     data['palette-insight-server']['display_name'] = "Palette Insight Web Service"
