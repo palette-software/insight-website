@@ -166,7 +166,18 @@ class RequestHandler(BaseHTTPRequestHandler):
                 with subprocess.Popen(["tail","-10","/var/log/insight-services/progress.log"],
                         stdout=subprocess.PIPE,
                         stderr=subprocess.DEVNULL) as proc:
-                    respond_json(self, {'line': proc.stdout.read().decode()})
+                    response_raw = proc.stdout.read().decode()
+                    response = []
+                    for line in response_raw.splitlines():
+                        progress = 0
+                        match = re.search("(\d+),(.*)", line)
+                        if match:
+                            progress = match.group(1)
+                        response_line = {}
+                        response_line['line'] = match.group(2)
+                        response_line['progress'] = progress
+                        response.append(response_line)
+                    respond_json(self, json.dumps(response))
             else:
                 filename = BASEDIR + "/static/" + self.path
                 data = ""

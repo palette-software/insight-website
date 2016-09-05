@@ -6,21 +6,43 @@ $( document ).ready(function() {
 
     var statusContent = $('#status');
     var statusPanel = $('#statusPanel');
+    var progressCtl = $('#progress');
+
+    var completed = function() {
+        var delayedHide = window.setTimeout(function() {
+            progressCtl.addClass("hidden");
+            delayedHide = window.clearTimeout();
+        }, 1500);
+    };
 
     var getProgress = window.setInterval(function() {
         $.ajax({
             url: "/control/update/progress"
         })
         .done(function( data ) {
-            if (data != undefined && data.line != "") {
-                statusContent.html(data.line);
+            if (data == undefined) {
+                return;
+            }
+
+            data = JSON.parse(data);
+            if (data != undefined && data.length != null && data.length > 0) {
+                var content = "";
+                var progress = 0;
+                for (var i = 0; i < data.length; i++) {
+                    content += data[i].line + "\n";
+                    progress = data[i].progress;
+                }
+                var progressBar = $('#progressBar');
+                setProgress(progressBar, progress);
+                if (progress == 100) {
+                    completed();
+                }
+                statusContent.html(content);
                 statusPanel.removeClass("hidden");
             } else {
-                var delayedHide = window.setTimeout(function() {
+                    completed();
                     statusContent.html("");
                     statusPanel.addClass("hidden");
-                    delayedHide = window.clearTimeout();
-                }, 1500);
             }
         });
     }, 1000);
@@ -31,34 +53,16 @@ $( document ).ready(function() {
         var targetUrl = $this.attr('href');
 
         if ($this.attr("id") == 'update') {
-            var progressCtl = $('#progress');
             progressCtl.removeClass("hidden");
             var progressBar = $('#progressBar');
             var progress = 0;
             setProgress(progressBar, 1);
-            var ticker = window.setInterval(function() {
-                if (progress < 95) {
-                    progress += 1;
-                    setProgress(progressBar, progress);
-                }
-            }, 400);
         }
 
         $.ajax({
             url: targetUrl,
         })
         .done(function( data ) {
-            if ($this.attr("id") == 'update') {
-                setProgress(progressBar, 100);
-                window.clearInterval(ticker);
-                statusContent.html("");
-
-                var delayedHide = window.setTimeout(function() {
-                    progressCtl.addClass("hidden");
-                    delayedHide = window.clearTimeout();
-                }, 1500);
-            }
-
         });
     });
 });
