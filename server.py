@@ -156,6 +156,11 @@ class RequestHandler(BaseHTTPRequestHandler):
                     Template(filename=BASEDIR + '/templates/control.jade',
                         lookup=TEMPLATE_LOOKUP, preprocessor=mako_preprocessor,
                         module_directory="/tmp/mako_modules").render())
+            elif self.path == '/config':
+                respond_html(self,
+                    Template(filename=BASEDIR + '/templates/config.jade',
+                        lookup=TEMPLATE_LOOKUP, preprocessor=mako_preprocessor,
+                        module_directory="/tmp/mako_modules").render())
             elif self.path == '/control/start':
                 respond_command_output(self, ["sudo", "/usr/local/bin/insight-services", "start"])
             elif self.path == '/control/stop':
