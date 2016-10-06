@@ -44,6 +44,16 @@ $(function(){
             processData: false,
             contentType: false,
             type: 'PUT',
+        })
+        .done(function( data ) {
+            var getConfigCommand = {
+                command: "GET-CONFIG"
+            }
+            $.ajax({
+                url: 'http://localhost:9000/api/v1/command',
+                data: getConfigCommand,
+                type: 'PUT',
+            });
         });
     }
 
