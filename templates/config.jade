@@ -1,0 +1,29 @@
+extends layout
+include mixins
+
+block code
+    script(src='config.js')
+    style(type="text/css", media="screen") 
+        |    #editor {
+        |        min-height: 500px;
+        |        height: 100%;
+        |    }
+
+block title
+    title Agent Configuration
+
+block content
+    .dropdown#hostnames
+        button.btn.btn-default.dropdown-toggle#dropdownMenu1(type="button", data-toggle="dropdown", aria-haspopup="true", aria-expanded="true") Select host
+            span.caret
+        ul.dropdown-menu#hostlist(aria-labelledby="dropdownMenu1")
+
+    .panel.panel-default
+        .panel-heading
+            h4 Config.yml
+        .panel-body
+            pre#editor
+
+    button.btn.btn-success#saveButton(type="button", onclick="saveConfig()") Save
+
+    script(src="ace/ace.js", type="text/javascript", charset="utf-8")
