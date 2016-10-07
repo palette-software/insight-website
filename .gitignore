@@ -89,3 +89,4 @@ ENV/
 
 # Ide files
 *.swp
+.idea/
