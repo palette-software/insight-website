@@ -1,4 +1,6 @@
 $(function(){
+    var host = "https://" + location.hostname;
+    // host = "http://localhost:9000"; // Uncomment this line when run locally
     var currentHost = "";
     var addHost = function(hostname) {
         $('#hostnames ul').append('<li><a href="#">' + hostname + '</a></li>');
@@ -6,7 +8,7 @@ $(function(){
 
     var getHosts = function() {
         $.ajax({
-            url: "http://localhost:9000/api/v1/agents"
+            url: host + "/api/v1/agents"
         })
         .done(function( data ) {
             var agentList = JSON.parse(data);
@@ -24,7 +26,7 @@ $(function(){
 
     var loadConfig = function(hostname) {
         $.ajax({
-            url: 'http://localhost:9000/api/v1/config?hostname=' + hostname,
+            url: host + '/api/v1/config?hostname=' + hostname,
         })
         .done(function( data ) {
             editor.session.setValue(data);
@@ -39,7 +41,7 @@ $(function(){
         formData.append("uploadfile", blob);
 
         $.ajax({
-            url: 'http://localhost:9000/api/v1/config?hostname=' + hostname,
+            url: host + '/api/v1/config?hostname=' + hostname,
             data: formData,
             processData: false,
             contentType: false,
@@ -50,7 +52,7 @@ $(function(){
                 command: "GET-CONFIG"
             }
             $.ajax({
-                url: 'http://localhost:9000/api/v1/command',
+                url: host + '/api/v1/command',
                 data: getConfigCommand,
                 type: 'PUT',
             });
