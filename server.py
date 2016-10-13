@@ -118,14 +118,14 @@ def parse_status(status):
     # We are matching on an optional # for commenting out the jobs
     #   and after a cron timing definition (for example 5-55/5 * * * * )
     #   and afterwards the name of the job
-    match = re.search("(.*?([^\s]+\s+){5}/opt/palette-insight-talend/load_tables.sh)", status)
+    match = re.search("(.*?([^\s]+\s+){5}/opt/insight-gp-import/run_gp_import.sh)", status)
     if match:
         # Search for the # in the beginning
         data['datamodel']['load_tables']['active'] = match and not re.search("\#", match.group(1))
     else:
         data['datamodel']['load_tables']['active'] = False
 
-    match = re.search("palette-insight-loadtables-(\d+\.\d+\.\d+).*", status)
+    match = re.search("palette-insight-gp-import-(\d+\.\d+\.\d+).*", status)
     if match:
         data['datamodel']['load_tables']['version'] = match.group(1)
 
