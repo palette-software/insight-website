@@ -26,10 +26,7 @@ addons:
 # command to install dependencies
 install: "pip install -r requirements.txt"
 
-# command to run tests
-script: echo "No Tests right now :("
-
-before_deploy:
+script:
   # Create the zip file for github upload
   - export PCKG_DIR=`pwd`
   - export PCKG_FILE=$PACKAGE-$PRODUCT_VERSION-python$TRAVIS_PYTHON_VERSION.zip
@@ -54,6 +51,7 @@ before_deploy:
   - mkdir -p _build
   - rpmbuild -bb --buildroot $(pwd) --define "version $PRODUCT_VERSION" --define "buildrelease $TRAVIS_BUILD_NUMBER" --define "_rpmdir $(pwd)/_build" ${SPEC_FILE}
   - popd
+
 
 deploy:
   provider: script
