@@ -52,6 +52,9 @@ Packager: Palette Developers <developers@palette-software.com>
 
 #Requires(pre): /usr/sbin/useradd, /usr/bin/getent
 
+# Travis will fill in the exact version during deploy
+Requires: palette-insight-toolkit
+
 %pre
 # noop
 

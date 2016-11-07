@@ -26,10 +26,7 @@ addons:
 # command to install dependencies
 install: "pip install -r requirements.txt"
 
-# command to run tests
-script: echo "No Tests right now :("
-
-before_deploy:
+script:
   # Create the zip file for github upload
   - export PCKG_DIR=`pwd`
   - export PCKG_FILE=$PACKAGE-$PRODUCT_VERSION-python$TRAVIS_PYTHON_VERSION.zip
@@ -44,10 +41,17 @@ before_deploy:
   - cp -R templates rpm-build/opt/insight-services-webui
   - pushd rpm-build
 
+  # Freeze the dependencies of requirements
+  - export SPEC_FILE=insight-services-webui.spec
+  - ./freeze-requirement.sh palette-insight-toolkit x86_64 ${SPEC_FILE}
+  # Show the contents of the modified (frozen versions) spec file
+  - cat ${SPEC_FILE}
+
   # Build rpm package
   - mkdir -p _build
-  - rpmbuild -bb --buildroot $(pwd) --define "version $PRODUCT_VERSION" --define "buildrelease $TRAVIS_BUILD_NUMBER" --define "_rpmdir $(pwd)/_build" ../insight-services-webui.spec
+  - rpmbuild -bb --buildroot $(pwd) --define "version $PRODUCT_VERSION" --define "buildrelease $TRAVIS_BUILD_NUMBER" --define "_rpmdir $(pwd)/_build" ${SPEC_FILE}
   - popd
+
 
 deploy:
   provider: script
