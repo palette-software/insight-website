@@ -44,9 +44,15 @@ before_deploy:
   - cp -R templates rpm-build/opt/insight-services-webui
   - pushd rpm-build
 
+  # Freeze the dependencies of requirements
+  - export SPEC_FILE=insight-services-webui.spec
+  - ./freeze-requirement.sh palette-insight-toolkit x86_64 ${SPEC_FILE}
+  # Show the contents of the modified (frozen versions) spec file
+  - cat ${SPEC_FILE}
+
   # Build rpm package
   - mkdir -p _build
-  - rpmbuild -bb --buildroot $(pwd) --define "version $PRODUCT_VERSION" --define "buildrelease $TRAVIS_BUILD_NUMBER" --define "_rpmdir $(pwd)/_build" ../insight-services-webui.spec
+  - rpmbuild -bb --buildroot $(pwd) --define "version $PRODUCT_VERSION" --define "buildrelease $TRAVIS_BUILD_NUMBER" --define "_rpmdir $(pwd)/_build" ${SPEC_FILE}
   - popd
 
 deploy:
