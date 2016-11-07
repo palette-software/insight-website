@@ -42,7 +42,7 @@ script:
   - pushd rpm-build
 
   # # Freeze the dependencies of requirements
-  # - export SPEC_FILE=insight-services-webui.spec
+  - export SPEC_FILE=insight-services-webui.spec
   # - ./freeze-requirement.sh palette-insight-toolkit x86_64 ${SPEC_FILE}
   # # Show the contents of the modified (frozen versions) spec file
   # - cat ${SPEC_FILE}
