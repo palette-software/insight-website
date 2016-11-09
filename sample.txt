@@ -1,6 +1,6 @@
 
 
-=====[ Temporary backup crontab /etc/insight-services/insight.cron.tmp exists ]=====
+=====[ Temporary backup crontab /etc/palette-insight-website/insight.cron.tmp exists ]=====
 
 
 =====[ Server status ]=====
@@ -49,7 +49,7 @@ palette-insight-server-1.4.10-604.x86_64
 
 =====[ Insight services status ]=====
 insight-gpfdist                  RUNNING   pid 11582, uptime 6:57:52
-insight-services-webui           RUNNING   pid 6030, uptime 5:49:53
+palette-insight-website          RUNNING   pid 6030, uptime 5:49:53
 palette-insight-server           RUNNING   pid 26692, uptime 2 days, 0:40:39
 
 

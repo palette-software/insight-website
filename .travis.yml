@@ -33,16 +33,23 @@ script:
   - zip -r $PCKG_FILE $PCKG_DIR -x \*.git\* -x *\.travis.yml\*
 
   # Prepare rpm content
-  - mkdir -p rpm-build/opt/insight-services-webui
-  - mkdir -p rpm-build/var/log/insight-services-webui
-  - cp server.py rpm-build/opt/insight-services-webui
-  - cp requirements.txt rpm-build/opt/insight-services-webui
-  - cp -R static rpm-build/opt/insight-services-webui
-  - cp -R templates rpm-build/opt/insight-services-webui
+  - mkdir -p rpm-build/opt/palette-insight-website
+  - mkdir -p rpm-build/var/log/palette-insight-website
+  - mkdir -p rpm-build/etc/supervisord.d
+  - mkdir -p rpm-build/etc/nginx/conf.d
+  - mkdir -p rpm-build/usr/local/bin/
+  - mkdir -p rpm-build/etc/palette-insight-website
+  - cp insight-services.sh rpm-build/usr/local/bin/insight-services
+  - cp nginx.site.conf rpm-build/etc/nginx/conf.d/palette-insight-website.conf
+  - cp supervisor.conf rpm-build/etc/supervisord.d/palette-insight-website.ini
+  - cp server.py rpm-build/opt/palette-insight-website
+  - cp requirements.txt rpm-build/opt/palette-insight-website
+  - cp -R static rpm-build/opt/palette-insight-website
+  - cp -R templates rpm-build/opt/palette-insight-website
   - pushd rpm-build
 
   # # Freeze the dependencies of requirements
-  - export SPEC_FILE=insight-services-webui.spec
+  - export SPEC_FILE=palette-insight-website.spec
   # - ./freeze-requirement.sh palette-insight-toolkit x86_64 ${SPEC_FILE}
   # # Show the contents of the modified (frozen versions) spec file
   # - cat ${SPEC_FILE}
