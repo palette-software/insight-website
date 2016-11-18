@@ -78,6 +78,12 @@ if [ $? -ne 0 ]; then
     service nginx restart
 fi
 
+# Make sure that the old version of insight website is no longer registered
+rm -rf /opt/insight-services-webui/
+rm -rf /var/log/insight-services
+rm -rf /etc/insight-services
+rm -f /etc/supervisord.d/insight-services-webui.ini
+
 # Detect new service
 service supervisord restart
 
