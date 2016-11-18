@@ -166,9 +166,11 @@ class RequestHandler(BaseHTTPRequestHandler):
             elif self.path == '/control/stop':
                 respond_command_output(self, ["sudo", "/usr/local/bin/insight-services", "stop"])
             elif self.path == '/control/update':
-                respond_command_output(self, ["/opt/insight-toolkit/update.sh"])
+                # Create an update process in the background, which won't be killed even if
+                # palette-insight-website or supervisord gets restarted
+                respond_command_output(self, ["nohup", "/opt/insight-toolkit/update.sh", "&"])
             elif self.path == '/control/update/progress':
-                with subprocess.Popen(["tail","-10","/var/log/insight-services/progress.log"],
+                with subprocess.Popen(["tail","-10","/var/log/palette-insight-website/progress.log"],
                         stdout=subprocess.PIPE,
                         stderr=subprocess.DEVNULL) as proc:
                     response_raw = proc.stdout.read().decode()
