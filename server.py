@@ -16,6 +16,8 @@ import subprocess
 import json
 import re
 
+import agent_installer
+
 PORT = 9080
 BASEDIR = "/tmp"
 TEMPLATE_LOOKUP = TemplateLookup(directories=['/'], preprocessor=mako_preprocessor)
@@ -151,11 +153,15 @@ class RequestHandler(BaseHTTPRequestHandler):
                     Template(filename=BASEDIR + '/templates/index.jade',
                         lookup=TEMPLATE_LOOKUP, preprocessor=mako_preprocessor,
                         module_directory="/tmp/mako_modules").render(status=status_dict))
+
+            elif self.path.startswith('/agent'):
+                respond_agent(self)
+
             elif self.path == '/control':
                 respond_html(self,
                     Template(filename=BASEDIR + '/templates/control.jade',
                         lookup=TEMPLATE_LOOKUP, preprocessor=mako_preprocessor,
-                        module_directory="/tmp/mako_modules").render())
+                        module_directory="/tmp/mako_modules").render(agent_versions=agent_installer.get_installed_versions()))
             elif self.path == '/config':
                 respond_html(self,
                     Template(filename=BASEDIR + '/templates/config.jade',
@@ -224,6 +230,27 @@ def respond_json(req, data):
     req.send_header('Content-type', 'application/json')
     req.end_headers()
     req.wfile.write(str.encode(json_data))
+
+
+def respond_agent(req):
+    version_match = re.match("^/agent/(\d+\.\d+\.\d+)", req.path)
+    if version_match is None:
+        req.send_response(404)
+        return
+
+    version = version_match.group(1)
+
+    if version not in agent_installer.get_installed_versions():
+        req.send_response(204)
+        return
+
+    filename, path = agent_installer.get_path_and_name_for_verison(version)
+
+    req.send_response(200)
+    req.send_header('Content-type', 'application/x-msi')
+    req.send_header('Content-Disposition', 'attachment; filename="{filename}"'.format(filename=filename))
+    req.end_headers()
+    req.wfile.write(open(path, "rb").read())
 
 try:
     BASEDIR = os.path.dirname(os.path.abspath(__file__))

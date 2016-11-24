@@ -28,3 +28,14 @@ block content
                     h3 Update progress
                 .panel-body
                     pre#status
+    if agent_versions
+        .row
+            .col-md-4
+                .panel.panel-info
+                    .panel-heading
+                        h3 Agents
+                    .panel-body
+                        p
+                            .btn-toolbar
+                                each version in agent_versions
+                                    a.btn.btn-success(href="/agent/"+version) v#{version}
