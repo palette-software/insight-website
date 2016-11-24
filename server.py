@@ -129,7 +129,7 @@ def parse_status(status):
     if match:
         data['datamodel']['load_tables']['version'] = match.group(1)
 
-    match = re.search("(.*?([^\s]+\s+){5}/opt/insight-toolkit/loadctrl.sh)", status)
+    match = re.search("(.*?([^\s]+\s+){5}/opt/insight-reporting-framework/run_reporting.sh)", status)
     if match:
         data['datamodel']['reporting']['active'] = match and not re.search("\#", match.group(1))
     else:
