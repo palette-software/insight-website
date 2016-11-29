@@ -85,7 +85,8 @@ rm -rf /etc/insight-services
 rm -f /etc/supervisord.d/insight-services-webui.ini
 
 # Detect new service
-service supervisord restart
+supervisorctl reread
+supervisorctl update
 
 # (Re)start palette-insight-website via supervisord
 supervisorctl restart palette-insight-website
