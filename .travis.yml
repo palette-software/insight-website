@@ -8,7 +8,7 @@ env:
     - secure: "NVj+dKlTlOySMVqMdotAkoQkys1tnLo6GBNwZ6NRcaKRtIq1tF0edRUey3EWHVsNueHDzZzkiXZeeGdskQ0IoUm1qMEZ1pf6GR8iLkraZnUdqqYvSO1HFY96GzpkZ2pGDzj8cU2MQIQf2G8rh+SJyoVCD/VeKc62NlAKxXiLXgbFby+80lmaLkluGlsxOurKXhcBYRZbH5Z51vC4Dz51SQozFy2+Ld4QpEAqoFaY0810XZUcNtjEKECsiFApyqU+SeHbw8lzid0ryOPmZBi/voyq6N0L3ILy9m8CoormIP+5M0SLuspWy8OmFMS1YXotk/7usu/fRwOQwevT5p+SkQajaMNQwXvwy33i3nR6fHBN+r6lmiHtI4soPWAxJ74ozfsEO5sx4frn3xE3ulQn/mRzl9obAKjzr/WrudmlN6v5qCh4x1gscMAPDJ3dSafuVVuehsh3KEQNROgoOr85S9qTx7jhhPwR6ofl7zG7R+JfTBn6mqX4g4h7iz5aC/QwenHPyKp8ramuf7mYaJrMHOv1HalsgYkCKwDpI4k0Y27UnhcDR/lW99BXCMP2A5k1ksBN0mrzmO+Mk0bUHUKUjoR1Ax0BYRVAdyGkepNjHpCyRMsWzwzyO1hBHARbg0iE+RFieCSAKbXtKn+qUcwf1mE8ETWdXkGuoqUegzwuL3E="
     # DEPLOY_PASS=....
     - secure: "DFcxHEAcLfy8BPlJX8KubAjpyAUsANmUigRXLxliPqFQHKK7EcG6wa+GiI/JrAXNgnKD2l/9FGQJ0B1/CCvYvysRU77OYG4Z80FwWsiLvDTp4w+v7AifGKUN/NX96ecvXOJmiJJlIZ0TtA0aUB/VJG4LI/UGC62//k7wJXZHUIrAPF8aHHcOgcs0VwQPPnxgpJrALmkWqcmN5SBW5v8Li3sbT4iquEiM33GLb0JkJmu9gBNWhx1jPI69Bp0B3e8GJH2oxrU6XfTmDMDAJVTblPgJRsIOyU4r+sSA/aCq0yAVCKm9ZrONwdpeyri4QlovzqxyXeLVBvJj6SUuBRVWecmH3OonFzC/cefzOfZ6Qt4XNvOEK6ar/XIa6D1f8Sp7uuerFglDZXWkbxf+OXfHnp3JpTpZQFNs+/CS7PiX4hLm/em2xZgPPQDfPbF0wpkZ793DlK4o8NZo6ts2hZp1MPKSHkDgNVQo3gd8J93kW9UxSfToZc8epbJVvBFdKrirov7uTH1qm7DCXnycXAMYIKMHuLq9mLVUcDmUftdLSU7sT3hlo6pqc7kpc3QcRCIq69ZCFKokWzk7Jx2FCSTObihYESHDf9vRPy6xVPMNTpj44T633tbVnZe3eB8lW3qn8VsdOfNFfSP2IAaCU0PqpLkG6guaNm0cxTPJGMJGJlE="
-    - PRODUCT_VERSION=v1.0.$TRAVIS_BUILD_NUMBER
+    - VERSION=v1.0.$TRAVIS_BUILD_NUMBER
     - OWNER=palette-software
     - PACKAGE=insight-services-status
     - DEPLOY_HOST=rpm.palette-software.com
@@ -29,37 +29,14 @@ install: "pip install -r requirements.txt"
 script:
   # Create the zip file for github upload
   - export PCKG_DIR=`pwd`
-  - export PCKG_FILE=$PACKAGE-$PRODUCT_VERSION-python$TRAVIS_PYTHON_VERSION.zip
+  - export PCKG_FILE=$PACKAGE-$VERSION-python$TRAVIS_PYTHON_VERSION.zip
   - zip -r $PCKG_FILE $PCKG_DIR -x \*.git\* -x *\.travis.yml\*
 
-  # Prepare rpm content
-  - mkdir -p rpm-build/opt/palette-insight-website
-  - mkdir -p rpm-build/var/log/palette-insight-website
-  - mkdir -p rpm-build/etc/supervisord.d
-  - mkdir -p rpm-build/etc/nginx/conf.d
-  - mkdir -p rpm-build/usr/local/bin/
-  - mkdir -p rpm-build/etc/palette-insight-website
-  - cp insight-services.sh rpm-build/usr/local/bin/insight-services
-  - cp nginx.site.conf rpm-build/etc/nginx/conf.d/palette-insight-website.conf
-  - cp supervisor.conf rpm-build/etc/supervisord.d/palette-insight-website.ini
-  - cp server.py rpm-build/opt/palette-insight-website
-  - cp agent_installer.py rpm-build/opt/palette-insight-website
-  - cp requirements.txt rpm-build/opt/palette-insight-website
-  - cp -R static rpm-build/opt/palette-insight-website
-  - cp -R templates rpm-build/opt/palette-insight-website
-  - pushd rpm-build
-
-  # # Freeze the dependencies of requirements
-  - export SPEC_FILE=palette-insight-website.spec
-  # - ./freeze-requirement.sh palette-insight-toolkit x86_64 ${SPEC_FILE}
-  # # Show the contents of the modified (frozen versions) spec file
-  # - cat ${SPEC_FILE}
+  # Run tests
+  - python -m unittest
 
   # Build rpm package
-  - mkdir -p _build
-  - rpmbuild -bb --buildroot $(pwd) --define "version $PRODUCT_VERSION" --define "buildrelease $TRAVIS_BUILD_NUMBER" --define "_rpmdir $(pwd)/_build" ${SPEC_FILE}
-  - popd
-
+  - ./create_rpm.sh
 
 deploy:
   provider: script
@@ -71,4 +48,3 @@ deploy:
 
 notifications:
   email: false
-
