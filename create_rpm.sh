@@ -42,6 +42,6 @@ cp -R ../templates opt/palette-insight-website
 echo "BUILDING VERSION:v$VERSION"
 
 # Build rpm package
-rpmbuild -bb --buildroot $(pwd) --define "version $VERSION" --define "buildrelease $PACKAGEVERSION" --define "_rpmdir $(pwd)/_build" ../palette-insight-website.spec
+rpmbuild -bb --buildroot $(pwd) --define "version $VERSION" --define "buildrelease $PACKAGEVERSION" --define "_rpmdir $(pwd)/_build" palette-insight-website.spec
 
 popd
