@@ -33,6 +33,7 @@ script:
   - zip -r $PCKG_FILE $PCKG_DIR -x \*.git\* -x *\.travis.yml\*
 
   # Run tests
+  - pip install assertpy
   - python -m unittest
 
   # Build rpm package
