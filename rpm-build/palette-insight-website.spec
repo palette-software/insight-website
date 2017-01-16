@@ -42,7 +42,7 @@ AutoReqProv: no
 Prefix: /
 
 Group: default
-License: commercial
+License: GNU GPL v3
 Vendor: palette-software.net
 URL: http://www.palette-software.com
 Packager: Palette Developers <developers@palette-software.com>
