@@ -21,8 +21,6 @@ mkdir -p rpm-build
 pushd rpm-build
 mkdir -p _build
 
-pushd rpm-build
-
 # Create directories
 mkdir -p opt/palette-insight-website
 mkdir -p var/log/palette-insight-website
