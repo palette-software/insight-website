@@ -12,10 +12,13 @@ In this project you will find:
 - an [nginx](https://nginx.org) configuration [file](nginx.site.conf)
 - a [sample.txt](sample.txt) for testing purposes
 
-The Palette Insight Website servers both as a status information page for
-[Insight Server], [LoadTables], **TODO**
+The Palette Insight Website serves multiple functions:
 
-It is also capable to start and stop the [Insight Server] service. **FIXME**
+  - Shows status information on Palette Insight components.
+  - Enables download option for Palette Insight Agent on `/control`
+  - Allows user to stop and start Palette Insight server side services on `/control`
+  - Allows updating Palette Insight on `/control`
+  - Allows remote editing of Palette Insight Agent config files. `/config`
 
 ## How do I set up Palette Insight Website?
 
@@ -71,8 +74,6 @@ python -m unittest test_agent_installer.py
 
 ## Is Palette Insight Website supported?
 
-Palette Insight Website is licensed under the GNU GPLv3 license. For professional support please contact developers@palette-software.com
-
-**TODO: Clarify support part!**
+Palette Insight Website is licensed under the GNU GPL v3 license. For professional support please contact developers@palette-software.com
 
 Any bugs discovered should be filed in the [Palette Insight Website Git issue tracker](https://github.com/palette-software/insight-website/issues) or contribution is more than welcome.
