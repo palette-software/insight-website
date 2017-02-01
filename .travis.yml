@@ -10,6 +10,7 @@ env:
     - secure: "a0jN6jGTK0IuJe2U9jNnuheYjVdLcK2UfGXNVyWb5ErWyJZdUa+FwUqejLDjNjYF96m9vNwVVoVKuYV/gsAdRRCVwYAPdKK2heY7bRvhhHn7QgbuoaGFk0HvUVI/tK4AwKltfKbh+hvuHvwA4D1vcQp6axxVhtxlzyGYInvQPBWUi/vcb/Krr/IHWfMTmf0UUOwLg84v9GwuRllF4pmirbpe0bt4se7dHVEnqB8fPKZSt/g1If1BlKC3oNz7RBG3Sv6NHLHjszxp8mqfd7PJSg7UNsJkMRNv1+qF8kl3CvJS3eTKGhYyCI+rHgNjSQMyFco7GLBlpRNqh3WlPh7rux5mFIlNpsyf/42P8zNjM5BBG7uYq33pTXNwRAVHZ0m7vWQgsZeTg0J2htzEusRTz+J9gTrFplqes9jHM0KgJ4kSCzGVDVEvKNKCvq17hnTsviBGtXfeONM1eDRlVWIUpOJkEfs0SVk+PLMO3Okq3VmMyIMdMULM5v7vlhUGZlydRcURmqxjB3p0ww1f18SFgaVH+MG5H+sg8Vcp5BU0X7RbMKw5yBJLpqLCfPoGy6Od5nzBo1f9x3+OTYAug9URg25Si6hes/EP5cLdXN2zbkb9ylkowbFKz/YCm7KsqfWnGDgoonIrtUSLV8EItIcIUWxzorp/v4haVx1Xk+kyzWU="
     - RPM_VERSION=1.1.$TRAVIS_BUILD_NUMBER
     - PRODUCT_VERSION=v$RPM_VERSION
+    - OWNER=palette-software
     - PACKAGE=insight-services-status
     - DEPLOY_HOST=rpm.palette-software.com
     - DEPLOY_PATH=/var/palette-rpm-repo
