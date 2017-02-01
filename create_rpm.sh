@@ -6,8 +6,8 @@ set -e
 PACKAGEVERSION=${PACKAGEVERSION:-$TRAVIS_BUILD_NUMBER}
 export PACKAGEVERSION
 
-if [ -z "$VERSION" ]; then
-    echo "VERSION is missing"
+if [ -z "$RPM_VERSION" ]; then
+    echo "RPM_VERSION is missing"
     exit 1
 fi
 
@@ -39,9 +39,9 @@ cp ../requirements.txt opt/palette-insight-website
 cp -R ../static opt/palette-insight-website
 cp -R ../templates opt/palette-insight-website
 
-echo "BUILDING VERSION:v$VERSION"
+echo "BUILDING RPM_VERSION:v$RPM_VERSION"
 
 # Build rpm package
-rpmbuild -bb --buildroot $(pwd) --define "version $VERSION" --define "buildrelease $PACKAGEVERSION" --define "_rpmdir $(pwd)/_build" palette-insight-website.spec
+rpmbuild -bb --buildroot $(pwd) --define "version $RPM_VERSION" --define "buildrelease $PACKAGEVERSION" --define "_rpmdir $(pwd)/_build" palette-insight-website.spec
 
 popd
