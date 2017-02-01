@@ -8,8 +8,8 @@ env:
     - secure: "kL8mOEu78CN7TT7GZBw5IBZPC4xYbeRLnI/yOgywmEnLZfZj0U03ZCYwCWQbPQGrva8KoFhGx9jwYmq1o4iLwQBwwCDNH+A1ue+obsR1Tx+k/at0Udili432aVBeUohpNxb61puG+FETYdhe2YyP0JjG/B5ctDIJF9AXLCHnNFN5YKSIfRoNBlC2TJVayzT45yu4uz7CVbYiwbvX3la+W7mDbMzTdek5IyUk7kpEFaBLaBQeB02cQPRfZLjHzUywKAO1+52f7CHl+lCiCIwX79drVBhQgAC6WaxvlSma5T13R/6RsgMJRMss5CbYzHeXmszfsWiw6VasfPz9UndgD/Z1TtEZ+WTs9hQWmmTAIoTis+vShjbN75SQlnYue9TK/nloze5fDj6hNqY+8UokbKO7i0LxNR8L7Z9hRlFMZSvXpORwKOH0+SRAhE0zzzp/95krlLecdkkoIJzDYxTFJX786H8Hv7WIc2ka5Lzdt5ivU6011I43v2nhtWsx+yz9K7pzzKiBc19aG4oWkYR5yL32PijZ1AhceP8JdD94ExZUcQpsk4f5ih9kK+um+hnszdNWVF51/0/npN+aFRgiSfL2WePO6xK4C8xlcvGHYLCRnxQhWchkKE1rjDCxvTkFensSzHLwju0T43ksXU4SylrkjPvPd5JApRiE668QUIg="
     # DEPLOY_PASS=....
     - secure: "a0jN6jGTK0IuJe2U9jNnuheYjVdLcK2UfGXNVyWb5ErWyJZdUa+FwUqejLDjNjYF96m9vNwVVoVKuYV/gsAdRRCVwYAPdKK2heY7bRvhhHn7QgbuoaGFk0HvUVI/tK4AwKltfKbh+hvuHvwA4D1vcQp6axxVhtxlzyGYInvQPBWUi/vcb/Krr/IHWfMTmf0UUOwLg84v9GwuRllF4pmirbpe0bt4se7dHVEnqB8fPKZSt/g1If1BlKC3oNz7RBG3Sv6NHLHjszxp8mqfd7PJSg7UNsJkMRNv1+qF8kl3CvJS3eTKGhYyCI+rHgNjSQMyFco7GLBlpRNqh3WlPh7rux5mFIlNpsyf/42P8zNjM5BBG7uYq33pTXNwRAVHZ0m7vWQgsZeTg0J2htzEusRTz+J9gTrFplqes9jHM0KgJ4kSCzGVDVEvKNKCvq17hnTsviBGtXfeONM1eDRlVWIUpOJkEfs0SVk+PLMO3Okq3VmMyIMdMULM5v7vlhUGZlydRcURmqxjB3p0ww1f18SFgaVH+MG5H+sg8Vcp5BU0X7RbMKw5yBJLpqLCfPoGy6Od5nzBo1f9x3+OTYAug9URg25Si6hes/EP5cLdXN2zbkb9ylkowbFKz/YCm7KsqfWnGDgoonIrtUSLV8EItIcIUWxzorp/v4haVx1Xk+kyzWU="
-    - VERSION=v1.0.$TRAVIS_BUILD_NUMBER
-    - OWNER=palette-software
+    - RPM_VERSION=1.1.$TRAVIS_BUILD_NUMBER
+    - PRODUCT_VERSION=v$RPM_VERSION
     - PACKAGE=insight-services-status
     - DEPLOY_HOST=rpm.palette-software.com
     - DEPLOY_PATH=/var/palette-rpm-repo
@@ -29,7 +29,7 @@ install: "pip install -r requirements.txt"
 script:
   # Create the zip file for github upload
   - export PCKG_DIR=`pwd`
-  - export PCKG_FILE=$PACKAGE-$VERSION-python$TRAVIS_PYTHON_VERSION.zip
+  - export PCKG_FILE=$PACKAGE-$PRODUCT_VERSION-python$TRAVIS_PYTHON_VERSION.zip
   - zip -r $PCKG_FILE $PCKG_DIR -x \*.git\* -x *\.travis.yml\*
 
   # Run tests
