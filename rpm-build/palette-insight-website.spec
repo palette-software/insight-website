@@ -71,7 +71,10 @@ lokkit --service=http
 lokkit --service=https
 
 # Palette Insight Website uses the root so default must be disabled
+# CentOS 6.8
 mv /etc/nginx/conf.d/default.conf /etc/nginx/conf.d/default.conf.original
+# RHEL 7.3
+mv /etc/nginx/nginx.conf /etc/nginx/nginx.conf.original
 # Reload the nginx configuration so it forwards the http root to the palette-insight-website
 service nginx reload
 if [ $? -ne 0 ]; then
@@ -120,6 +123,8 @@ Palette Insight Website
 
 %attr(755, root root) /usr/local/bin/insight-services
 %dir /etc/palette-insight-website
+
+/etc/nginx/nginx.conf
 
 # config files can be defined according to this
 # http://www-uxsup.csx.cam.ac.uk/~jw35/docs/rpm_config.html

@@ -38,6 +38,7 @@ cp ../agent_installer.py opt/palette-insight-website
 cp ../requirements.txt opt/palette-insight-website
 cp -R ../static opt/palette-insight-website
 cp -R ../templates opt/palette-insight-website
+cp -a ../etc .
 
 echo "BUILDING RPM_VERSION:v$RPM_VERSION"
 
