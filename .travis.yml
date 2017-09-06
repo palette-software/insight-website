@@ -12,7 +12,7 @@ env:
     - PRODUCT_VERSION=v$RPM_VERSION
     - OWNER=palette-software
     - PACKAGE=insight-services-status
-    - DEPLOY_HOST=rpm.palette-software.com
+    - DEPLOY_HOST=rpm.palette-software.net
     - DEPLOY_PATH=/var/palette-rpm-repo
     - DEPLOY_USER=palette-rpm
 
