@@ -66,9 +66,16 @@ Requires: palette-insight-toolkit
 # palette-insight-toolkit installs python3
 pip3 install -r /opt/palette-insight-website/requirements.txt
 
-# Enable the http/s services on the firewall
-lokkit --service=http
-lokkit --service=https
+## Enable the http/s services on the firewall
+# We experienced that lokkit is overriding the existing iptables, thus we
+# need to make sure that ssh service will still remain enabled
+#lokkit --service=ssh
+#lokkit --service=http
+#lokkit --service=https
+## If firelwallD is enabled, try the following
+#firewall-cmd --zone=public --permanent --add-service=http
+#firewall-cmd --zone=public --permanent --add-service=https
+
 
 # Palette Insight Website uses the root so default must be disabled
 # CentOS 6.8
